@@ -2355,8 +2355,18 @@ function _pmParamRow(p) {
 
   let ctrl = '';
   if (p.type === 'ENUM' && (p.allowed_values || []).length) {
+    // Resolve curVal to numeric ID for backward compat:
+    // old saves store display text ("Li-Ion"), new saves store numeric ID ("67890").
+    let resolvedVal = curVal;
+    if (curVal && isNaN(Number(curVal))) {
+      const matched = (p.allowed_values || []).find(av => String(av.value) === curVal);
+      if (matched && matched.id != null) resolvedVal = String(matched.id);
+    }
     const opts = ['<option value="">— не указано —</option>'].concat(
-      p.allowed_values.map(av => `<option value="${esc(av.value)}" ${av.value === curVal ? 'selected' : ''}>${esc(av.value)}</option>`)
+      p.allowed_values.map(av => {
+        const optVal = av.id != null ? String(av.id) : esc(av.value);
+        return `<option value="${optVal}" ${optVal === resolvedVal ? 'selected' : ''}>${esc(av.value)}</option>`;
+      })
     ).join('');
     ctrl = `<select ${onch}>${opts}</select>`;
   } else if (p.type === 'BOOLEAN') {
