@@ -40,6 +40,7 @@ _BH_CACHE:       Dict[str, Dict[str, Any]] = {}
 _AI_ENRICH_CACHE: Dict[str, Dict[str, Any]] = {}
 _LOW_RATED_FILE      = os.path.join(os.path.dirname(__file__), "low_rated_offers.json")
 _LOW_RATED_THRESHOLD = 80
+_YM_CRITICAL_MISSING = {"Название", "Цена", "Изображения"}
 _ERRORS_FILE         = os.path.join(os.path.dirname(__file__), "product_errors.json")
 _WB_CATS_FILE        = os.path.join(os.path.dirname(__file__), "wb_categories.json")
 _OZON_CATS_FILE      = os.path.join(os.path.dirname(__file__), "ozon_categories.json")
@@ -546,23 +547,23 @@ async def ym_upload_stream(req: YMUploadRequest, request: Request):
                         yield evt("log", level=level, msg=f"    {color} Рейтинг: {rating}/100 (status: {status})")
                     else:
                         yield evt("log", level="info", msg=f"    {color} Status: {status}")
-                    CRITICAL_MISSING = {"Название", "Цена", "Изображения"}
-                    critical = [f for f in missing if f in CRITICAL_MISSING]
+                    critical = [f for f in missing if f in _YM_CRITICAL_MISSING]
                     if critical:
                         yield evt("log", level="warn",
                                   msg=f"    Не заполнено: {', '.join(critical)}")
                     elif missing:
                         yield evt("log", level="info",
                                   msg="    ЯМ обрабатывает данные асинхронно, проверьте кабинет через несколько минут")
+                    is_critical_final = bool(critical)
                     if status == "NEED_FIX":
                         _append_low_rated({"code": code, "offer_id": offer_id_val, "name": name,
                                            "category": cat, "category_name": cat_name,
                                            "rating": rating, "card_status": state.get("card_status",""),
-                                           "missing_fields": missing, "is_critical": state.get("is_critical",False),
+                                           "missing_fields": critical, "is_critical": is_critical_final,
                                            "uploaded_at": _now_iso()})
                     yield evt("item", code=code, success=True, offer_id=offer_id_val,
                               name=name, price=price, rating=rating, state_status=status,
-                              is_critical=state.get("is_critical",False), missing_fields=missing)
+                              is_critical=is_critical_final, missing_fields=critical)
                     ok_count += 1
                 else:
                     err = result.get("error","Неизвестная ошибка")
