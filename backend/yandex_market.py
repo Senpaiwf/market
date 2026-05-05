@@ -566,7 +566,7 @@ class YandexMarketClient:
                 if v in (None, ""):
                     continue
                 try:
-                    vid = int(v)
+                    vid = int(float(v))
                     result.append({"parameterId": pid, "valueId": vid})
                 except (ValueError, TypeError):
                     result.append({"parameterId": pid, "value": str(v)})
