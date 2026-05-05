@@ -546,9 +546,14 @@ async def ym_upload_stream(req: YMUploadRequest, request: Request):
                         yield evt("log", level=level, msg=f"    {color} Рейтинг: {rating}/100 (status: {status})")
                     else:
                         yield evt("log", level="info", msg=f"    {color} Status: {status}")
-                    if missing:
+                    CRITICAL_MISSING = {"Название", "Цена", "Изображения"}
+                    critical = [f for f in missing if f in CRITICAL_MISSING]
+                    if critical:
                         yield evt("log", level="warn",
-                                  msg=f"    Не заполнено: {', '.join(missing[:6])}{'…' if len(missing)>6 else ''}")
+                                  msg=f"    Не заполнено: {', '.join(critical)}")
+                    elif missing:
+                        yield evt("log", level="info",
+                                  msg="    ЯМ обрабатывает данные асинхронно, проверьте кабинет через несколько минут")
                     if status == "NEED_FIX":
                         _append_low_rated({"code": code, "offer_id": offer_id_val, "name": name,
                                            "category": cat, "category_name": cat_name,

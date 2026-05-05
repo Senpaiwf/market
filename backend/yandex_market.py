@@ -327,11 +327,9 @@ class YandexMarketClient:
             ("name", "Название"),
             ("description", "Описание"),
             ("vendor", "Бренд"),
-            ("marketCategoryId", "Категория"),
             ("pictures", "Изображения"),
             ("basicPrice", "Цена"),
             ("weightDimensions", "Габариты/вес"),
-            ("parameterValues", "Характеристики категории"),
         ]
         for key, label in REQUIRED:
             v = mapping_offer.get(key)
