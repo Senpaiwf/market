@@ -2359,11 +2359,12 @@ function _pmParamRow(p) {
     // old saves store display text ("Li-Ion"), new saves store numeric ID ("67890").
     let resolvedVal = curVal;
     if (curVal && isNaN(Number(curVal))) {
-      const matched = (p.allowed_values || []).find(av => String(av.value) === curVal);
+      const matched = (p.allowed_values || []).find(av => av.value != null && String(av.value) === curVal);
       if (matched && matched.id != null) resolvedVal = String(matched.id);
     }
     const opts = ['<option value="">— не указано —</option>'].concat(
       p.allowed_values.map(av => {
+        // Use numeric YM valueId when available; fallback to text sends value: str via _build_params
         const optVal = av.id != null ? String(av.id) : esc(av.value);
         return `<option value="${optVal}" ${optVal === resolvedVal ? 'selected' : ''}>${esc(av.value)}</option>`;
       })
