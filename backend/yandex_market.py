@@ -545,16 +545,15 @@ class YandexMarketClient:
         return offer
 
     def _build_params(self, p: dict, category_id: str, resolved: dict) -> list:
-        """Характеристики ЯМ. API требует числовой parameterId (не имя).
-        Берём значения из resolved.params_values с ключами вида 'ym_<param_id>'
-        (их наполняет B&H AI-матчинг или ручной ввод пользователя).
-        Записи без валидного числового ID пропускаем — иначе API вернёт 400."""
+        """Характеристики ЯМ. API требует числовой parameterId.
+        Для enum-параметров отправляем valueId (int), для текстовых — value (str).
+        Ключи вида 'ym_<param_id>' из resolved.params_values.
+        """
         result = []
         params_values = resolved.get("params_values", {}) or {}
         for key, value in params_values.items():
             if value in (None, "", []):
                 continue
-            # Ключ вида "ym_12345" → parameterId=12345
             if not (isinstance(key, str) and key.startswith("ym_")):
                 continue
             raw_id = key[3:]
@@ -562,14 +561,15 @@ class YandexMarketClient:
                 pid = int(raw_id)
             except ValueError:
                 continue
-            # multivalue: значение может быть списком — выдаём по одной записи на значение
-            if isinstance(value, list):
-                for v in value:
-                    if v in (None, ""):
-                        continue
+            values = value if isinstance(value, list) else [value]
+            for v in values:
+                if v in (None, ""):
+                    continue
+                try:
+                    vid = int(v)
+                    result.append({"parameterId": pid, "valueId": vid})
+                except (ValueError, TypeError):
                     result.append({"parameterId": pid, "value": str(v)})
-            else:
-                result.append({"parameterId": pid, "value": str(value)})
         return result
 
     def get_questions(self, product: dict, category_id: str) -> list:
