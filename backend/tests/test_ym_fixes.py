@@ -111,3 +111,19 @@ def test_build_params_mixed_list_text_and_id():
     params = ym._build_params({}, "458", resolved)
     assert {"parameterId": 12345, "valueId": 67890} in params
     assert {"parameterId": 12345, "value": "some-text"} in params
+
+
+def test_build_params_float_string_integer_uses_value_id():
+    """Float string that is a whole number ("67890.0") → valueId: 67890."""
+    ym = _make_ym()
+    resolved = {"params_values": {"ym_12345": "67890.0"}}
+    params = ym._build_params({}, "458", resolved)
+    assert params == [{"parameterId": 12345, "valueId": 67890}]
+
+
+def test_build_params_float_string_non_integer_uses_value():
+    """Float string with fractional part ("1.5") → value: str (not truncated to valueId)."""
+    ym = _make_ym()
+    resolved = {"params_values": {"ym_12345": "1.5"}}
+    params = ym._build_params({}, "458", resolved)
+    assert params == [{"parameterId": 12345, "value": "1.5"}]

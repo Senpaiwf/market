@@ -41,6 +41,9 @@ _AI_ENRICH_CACHE: Dict[str, Dict[str, Any]] = {}
 _LOW_RATED_FILE      = os.path.join(os.path.dirname(__file__), "low_rated_offers.json")
 _LOW_RATED_THRESHOLD = 80
 _YM_CRITICAL_MISSING = {"Название", "Цена", "Изображения"}
+
+def _filter_critical(missing: list) -> list:
+    return [f for f in missing if f in _YM_CRITICAL_MISSING]
 _ERRORS_FILE         = os.path.join(os.path.dirname(__file__), "product_errors.json")
 _WB_CATS_FILE        = os.path.join(os.path.dirname(__file__), "wb_categories.json")
 _OZON_CATS_FILE      = os.path.join(os.path.dirname(__file__), "ozon_categories.json")
@@ -547,7 +550,7 @@ async def ym_upload_stream(req: YMUploadRequest, request: Request):
                         yield evt("log", level=level, msg=f"    {color} Рейтинг: {rating}/100 (status: {status})")
                     else:
                         yield evt("log", level="info", msg=f"    {color} Status: {status}")
-                    critical = [f for f in missing if f in _YM_CRITICAL_MISSING]
+                    critical = _filter_critical(missing)
                     if critical:
                         yield evt("log", level="warn",
                                   msg=f"    Не заполнено: {', '.join(critical)}")
@@ -747,10 +750,11 @@ async def ym_offer_check(req: YMCodeRequest):
     state = await ym.validate_offer_state(candidates)
     state["ms_code"] = req.code
     state["ms_name"] = product.get("name","")
+    critical = _filter_critical(state.get("missing_fields", []))
     if state.get("status") == "NEED_FIX":
         _append_low_rated({"code": req.code, "offer_id": state.get("offer_id"),
                            "name": product.get("name",""), "rating": state.get("rating"),
-                           "missing_fields": state.get("missing_fields",[]),
+                           "missing_fields": critical, "is_critical": bool(critical),
                            "card_status": state.get("card_status",""), "checked_at": _now_iso()})
     return {"ok": True, "state": state}
 
