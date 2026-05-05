@@ -456,6 +456,23 @@ class YandexMarketClient:
         """
         offer = self.build_offer(product, category_key, resolved or {})
         if self.business_id:
+            # Find the real offerId on YM first — avoids creating a duplicate when
+            # the existing card was uploaded previously with a different offerId.
+            our_id = offer["offerId"]
+            code = str(product.get("code", "")).strip()
+            candidates = list(dict.fromkeys(c for c in [our_id, code] if c))
+            m = await self._req(
+                "POST",
+                f"/businesses/{self.business_id}/offer-mappings",
+                {"offerIds": candidates},
+            )
+            if m.get("ok"):
+                for it in (m.get("data", {}).get("result", {}).get("offerMappings") or []):
+                    found = (it.get("offer") or {}).get("offerId", "")
+                    if found and found != our_id:
+                        offer["offerId"] = found
+                        break
+
             path = f"/businesses/{self.business_id}/offer-mappings/update"
             payload = {"offerMappings": [{"offer": offer}]}
         else:
