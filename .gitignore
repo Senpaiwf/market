@@ -1,0 +1,8 @@
+backend/.env
+backend/__pycache__/
+backend/yandex_category_params_cache.json
+backend/low_rated_offers.json
+backend/media/
+__pycache__/
+*.pyc
+*.pyo

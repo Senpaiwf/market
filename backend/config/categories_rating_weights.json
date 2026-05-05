@@ -1,0 +1,60 @@
+{
+  "_default": {
+    "fields": [
+      {"name": "name",        "source": "name",        "type": "mandatory",    "weight": 2.0},
+      {"name": "description", "source": "description", "type": "recommended",  "weight": 1.5},
+      {"name": "brand",       "source": "brand",       "type": "mandatory",    "weight": 1.0},
+      {"name": "price",       "source": "price_main",  "type": "mandatory",    "weight": 1.0},
+      {"name": "images",      "source": "images",      "type": "mandatory",    "weight": 2.0},
+      {"name": "dims",        "source": "dims_cm",     "type": "recommended",  "weight": 0.5}
+    ]
+  },
+  "yandex": {
+    "_default": {
+      "fields": [
+        {"name": "name",        "source": "name",        "type": "mandatory",   "weight": 2.0},
+        {"name": "description", "source": "description", "type": "recommended", "weight": 1.5},
+        {"name": "brand",       "source": "brand",       "type": "mandatory",   "weight": 1.0},
+        {"name": "price",       "source": "price_main",  "type": "mandatory",   "weight": 1.0},
+        {"name": "images",      "source": "images",      "type": "mandatory",   "weight": 2.0},
+        {"name": "dims",        "source": "dims_cm",     "type": "recommended", "weight": 0.5}
+      ]
+    },
+    "17677661": {
+      "fields": [
+        {"name": "name",        "source": "name",        "type": "mandatory",   "weight": 2.0},
+        {"name": "description", "source": "description", "type": "recommended", "weight": 1.5},
+        {"name": "brand",       "source": "brand",       "type": "mandatory",   "weight": 1.5},
+        {"name": "price",       "source": "price_main",  "type": "mandatory",   "weight": 1.0},
+        {"name": "images",      "source": "images",      "type": "mandatory",   "weight": 2.0},
+        {"name": "dims",        "source": "dims_cm",     "type": "recommended", "weight": 0.5},
+        {"name": "weight",      "source": "weight_kg",   "type": "optional",    "weight": 0.5}
+      ]
+    }
+  },
+  "ozon": {
+    "_default": {
+      "fields": [
+        {"name": "name",        "source": "name",        "type": "mandatory",   "weight": 2.0},
+        {"name": "description", "source": "description", "type": "recommended", "weight": 1.5},
+        {"name": "brand",       "source": "brand",       "type": "mandatory",   "weight": 1.0},
+        {"name": "price",       "source": "price_main",  "type": "mandatory",   "weight": 1.0},
+        {"name": "images",      "source": "images",      "type": "mandatory",   "weight": 2.0},
+        {"name": "dims",        "source": "dims_cm",     "type": "recommended", "weight": 0.5},
+        {"name": "barcode",     "source": "barcode",     "type": "optional",    "weight": 0.3}
+      ]
+    },
+    "17028910_91875": {
+      "fields": [
+        {"name": "name",        "source": "name",        "type": "mandatory",   "weight": 2.0},
+        {"name": "description", "source": "description", "type": "recommended", "weight": 2.0},
+        {"name": "brand",       "source": "brand",       "type": "mandatory",   "weight": 1.5},
+        {"name": "price",       "source": "price_main",  "type": "mandatory",   "weight": 1.0},
+        {"name": "images",      "source": "images",      "type": "mandatory",   "weight": 2.0},
+        {"name": "dims",        "source": "dims_cm",     "type": "recommended", "weight": 0.5},
+        {"name": "weight",      "source": "weight_kg",   "type": "recommended", "weight": 0.5},
+        {"name": "barcode",     "source": "barcode",     "type": "optional",    "weight": 0.3}
+      ]
+    }
+  }
+}

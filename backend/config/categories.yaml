@@ -1,0 +1,1573 @@
+# config/categories.yaml
+# Правила маппинга внутренних категорий (папка МС) → категории маркетплейсов.
+#
+# Структура правила:
+#   pattern      — строка для сравнения
+#   pattern_type — exact | contains | regex
+#   field        — поле RawProduct для проверки (default: internal_category)
+#   marketplace  — ozon | wb | ym
+#   cat_id       — ID категории на маркетплейсе
+#   cat_type_id  — type_id для Ozon (desc_cat_id + type_id = полный ключ)
+#   cat_name     — название категории (для логов и UI)
+#   priority     — число (больше = важнее, применяется первым)
+#
+# ID верифицированы из реальных кэшей:
+#   ozon_categories.json, wb_categories.json, yandex_category.json
+#
+# Ozon:  cat_id = desc_cat_id,  cat_type_id = type_id
+# WB:    cat_id = subjectID (число из ключа 's_NNNN' в wb_categories.json)
+# YM:    cat_id = числовой ID из yandex_category.json
+#
+# ════════════════════════════════════════════════════════════════════════════
+# ПРИОРИТЕТЫ:
+#   70  — точные папки МС (exact), верифицированные карточки
+#   60  — точные папки МС (exact)
+#   50  — подстрочные правила по папке (contains)
+#   25  — правила по названию товара (field: name)
+#   10  — общие regex-fallback
+# ════════════════════════════════════════════════════════════════════════════
+
+rules:
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # ШТАТИВЫ
+  # Ozon:  17028651/91780 — Электроника › Штативы и стабилизаторы › Штатив
+  # WB:    4680          — Штативы для съемки
+  # YM:    17677674      — Фото и видеокамеры › Фотооборудование › Стойки и крепежи
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "Штативы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028651
+    cat_type_id: 91780
+    cat_name: "Штатив"
+    priority: 60
+
+  - pattern: "Штативы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 4680
+    cat_name: "Штативы для съемки"
+    priority: 60
+
+  - pattern: "Штативы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 17677674
+    cat_name: "Стойки и крепежи"
+    priority: 60
+
+  # Штативные головки / площадки
+  - pattern: "Штативные головки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028651
+    cat_type_id: 91782
+    cat_name: "Штативная головка"
+    priority: 60
+
+  - pattern: "Штативные головки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 4680
+    cat_name: "Штативы для съемки"
+    priority: 60
+
+  - pattern: "Штативные головки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 8442711
+    cat_name: "Аксессуары для штативов и моноподов"
+    priority: 60
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # АВТОГРИП / крепления для экшн-камер
+  # Ozon:  17028651/91537 — Штативы и стабилизаторы › Крепление для экшн-камеры
+  # WB:    547            — Аксессуары для экшн-камер
+  # YM:    70121530       — Аксессуары для фото- и видеокамер
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "Автогрип"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028651
+    cat_type_id: 91537
+    cat_name: "Крепление для экшн-камеры"
+    priority: 60
+
+  - pattern: "Автогрип"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 547
+    cat_name: "Аксессуары для экшн-камер"
+    priority: 60
+
+  - pattern: "Автогрип"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # СТАБИЛИЗАТОРЫ / аксессуары к ним
+  # Ozon:  17028651/97357 — Штативы и стабилизаторы › Стабилизатор для камеры
+  # WB:    545            — Крепления для камер
+  # YM:    17677674       — Стойки и крепежи
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "Стабилизаторы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028651
+    cat_type_id: 97357
+    cat_name: "Стабилизатор для камеры"
+    priority: 60
+
+  - pattern: "Стабилизаторы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "Стабилизаторы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 17677674
+    cat_name: "Стойки и крепежи"
+    priority: 60
+
+  - pattern: "Аксессуары для стабилизаторов"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028651
+    cat_type_id: 863341198
+    cat_name: "Аксессуар для стабилизатора"
+    priority: 60
+
+  - pattern: "Аксессуары для стабилизаторов"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "Аксессуары для стабилизаторов"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # КРАНЫ / слайдеры
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "Краны"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028651
+    cat_type_id: 971052165
+    cat_name: "Слайдер для фото-видеотехники"
+    priority: 60
+
+  - pattern: "Краны"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 4680
+    cat_name: "Штативы для съемки"
+    priority: 60
+
+  - pattern: "Краны"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 17677674
+    cat_name: "Стойки и крепежи"
+    priority: 60
+
+  - pattern: "Слайдеры"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028651
+    cat_type_id: 971052165
+    cat_name: "Слайдер для фото-видеотехники"
+    priority: 60
+
+  - pattern: "Слайдеры"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 4680
+    cat_name: "Штативы для съемки"
+    priority: 60
+
+  - pattern: "Слайдеры"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 17677674
+    cat_name: "Стойки и крепежи"
+    priority: 60
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # ОСВЕЩЕНИЕ — студийный свет
+  # Ozon:  200001713/91750 — Оборудование для фотостудии › Студийное оборудование
+  # WB:    3153            — Осветители студийные
+  # YM:    17677661        — Фотооборудование › Осветительное оборудование
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "Моноблоки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91750
+    cat_name: "Студийное оборудование"
+    priority: 60
+
+  - pattern: "Моноблоки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 2872
+    cat_name: "Моноблоки"
+    priority: 60
+
+  - pattern: "Моноблоки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 17677661
+    cat_name: "Осветительное оборудование"
+    priority: 60
+
+  - pattern: "Студийные вспышки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91750
+    cat_name: "Студийное оборудование"
+    priority: 60
+
+  - pattern: "Студийные вспышки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 3153
+    cat_name: "Осветители студийные"
+    priority: 60
+
+  - pattern: "Студийные вспышки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 17677661
+    cat_name: "Осветительное оборудование"
+    priority: 60
+
+  # Портативный свет / LED-панели
+  # Ozon:  17028647/97420 — Аксессуары для фото- и видеотехники › Свет для мобильной съемки
+  # WB:    5594           — Осветители для смартфона
+  # YM:    17677661       — Осветительное оборудование
+  - pattern: "Портативный свет"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 97420
+    cat_name: "Свет для мобильной съемки"
+    priority: 60
+
+  - pattern: "Портативный свет"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 5594
+    cat_name: "Осветители для смартфона"
+    priority: 60
+
+  - pattern: "Портативный свет"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 17677661
+    cat_name: "Осветительное оборудование"
+    priority: 60
+
+  # Аксессуары для осветительных приборов / Светопроекционные насадки / Шторки / Рефлекторы
+  - pattern: "(?:Аксессуары для осветительных|Светопроекционные насадки|Шторки|Рефлекторы|Линзы френеля|Коврики)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91750
+    cat_name: "Студийное оборудование"
+    priority: 55
+
+  - pattern: "(?:Аксессуары для осветительных|Светопроекционные насадки|Шторки|Рефлекторы|Линзы френеля|Коврики)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: wb
+    cat_id: 3153
+    cat_name: "Осветители студийные"
+    priority: 55
+
+  - pattern: "(?:Аксессуары для осветительных|Светопроекционные насадки|Шторки|Рефлекторы|Линзы френеля|Коврики)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ym
+    cat_id: 17677661
+    cat_name: "Осветительное оборудование"
+    priority: 55
+
+  # Софтбоксы / фотозонты / октабоксы
+  - pattern: "Софтбоксы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 99011
+    cat_name: "Софтбокс"
+    priority: 60
+
+  - pattern: "Софтбоксы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 3153
+    cat_name: "Осветители студийные"
+    priority: 60
+
+  - pattern: "Софтбоксы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 17677661
+    cat_name: "Осветительное оборудование"
+    priority: 60
+
+  # Стойки для света
+  - pattern: "Стойки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91750
+    cat_name: "Студийное оборудование"
+    priority: 60
+
+  - pattern: "Стойки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 3153
+    cat_name: "Осветители студийные"
+    priority: 60
+
+  - pattern: "Стойки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 17677674
+    cat_name: "Стойки и крепежи"
+    priority: 60
+
+  - pattern: "Пьедесталы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91750
+    cat_name: "Студийное оборудование"
+    priority: 60
+
+  - pattern: "Пьедесталы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 3153
+    cat_name: "Осветители студийные"
+    priority: 60
+
+  - pattern: "Пьедесталы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 17677674
+    cat_name: "Стойки и крепежи"
+    priority: 60
+
+  # Накамерные вспышки
+  - pattern: "Накамерные вспышки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 91736
+    cat_name: "Вспышка"
+    priority: 60
+
+  - pattern: "Накамерные вспышки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 6106
+    cat_name: "Фотовспышки"
+    priority: 60
+
+  - pattern: "Накамерные вспышки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 17677661
+    cat_name: "Осветительное оборудование"
+    priority: 60
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # ОБВЕСЫ ДЛЯ КАМЕРЫ — клетки, ручки, крепления, клэмпы
+  # Ozon:  200001713/91741 — Оборудование для фотостудии › Крепление для камеры
+  # WB:    545             — Крепления для камер
+  # YM:    70121530        — Аксессуары для фото- и видеокамер
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "Клетки для камер"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91741
+    cat_name: "Крепление для камеры"
+    priority: 60
+
+  - pattern: "Клетки для камер"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "Клетки для камер"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  - pattern: "Ручки для клеток"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91741
+    cat_name: "Крепление для камеры"
+    priority: 60
+
+  - pattern: "Ручки для клеток"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "Ручки для клеток"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  - pattern: "Клэмпы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91741
+    cat_name: "Крепление для камеры"
+    priority: 60
+
+  - pattern: "Клэмпы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "Клэмпы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  - pattern: "Мэджик армы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91741
+    cat_name: "Крепление для камеры"
+    priority: 60
+
+  - pattern: "Мэджик армы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "Мэджик армы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  - pattern: "Суппорта"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91741
+    cat_name: "Крепление для камеры"
+    priority: 60
+
+  - pattern: "Суппорта"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "Суппорта"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  - pattern: "V-Mount площадки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91741
+    cat_name: "Крепление для камеры"
+    priority: 60
+
+  - pattern: "V-Mount площадки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "V-Mount площадки"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  - pattern: "Угловые площадки"
+    pattern_type: contains
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91741
+    cat_name: "Крепление для камеры"
+    priority: 60
+
+  - pattern: "Угловые площадки"
+    pattern_type: contains
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "Угловые площадки"
+    pattern_type: contains
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  # Быстросъёмные крепления / базовые площадки
+  - pattern: "(?:Быстросъемные крепления|Базовые площадки|Прочие площадки)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028651
+    cat_type_id: 91777
+    cat_name: "Площадка для штатива"
+    priority: 60
+
+  - pattern: "(?:Быстросъемные крепления|Базовые площадки|Прочие площадки)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "(?:Быстросъемные крепления|Базовые площадки|Прочие площадки)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  # Системы поддержки / плечевые риги
+  - pattern: "(?:Системы поддержки|Плечевые риги)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91750
+    cat_name: "Студийное оборудование"
+    priority: 60
+
+  - pattern: "(?:Системы поддержки|Плечевые риги)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "(?:Системы поддержки|Плечевые риги)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  # Компендиумы
+  - pattern: "Компендиумы"
+    pattern_type: contains
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91741
+    cat_name: "Крепление для камеры"
+    priority: 60
+
+  - pattern: "Компендиумы"
+    pattern_type: contains
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "Компендиумы"
+    pattern_type: contains
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # АКСЕССУАРЫ ДЛЯ КАМЕР — общая папка
+  # Ozon:  200001713/91750 — Студийное оборудование (верифицировано: 13098)
+  # WB:    545             — Крепления для камер
+  # YM:    70121530        — Аксессуары для фото- и видеокамер (верифицировано: 13098)
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "Аксессуары для камер"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91750
+    cat_name: "Студийное оборудование"
+    priority: 60
+
+  - pattern: "Аксессуары для камер"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "Аксессуары для камер"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  # Мобильная съёмка
+  - pattern: "Мобильная съемка"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 97420
+    cat_name: "Свет для мобильной съемки"
+    priority: 60
+
+  - pattern: "Мобильная съемка"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 547
+    cat_name: "Аксессуары для экшн-камер"
+    priority: 60
+
+  - pattern: "Мобильная съемка"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  # Грип-аксессуары
+  - pattern: "Грип.аксессуары"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91741
+    cat_name: "Крепление для камеры"
+    priority: 60
+
+  - pattern: "Грип.аксессуары"
+    pattern_type: regex
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "Грип.аксессуары"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  # Прочее (внутри обвесов)
+  - pattern: "Прочее"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91741
+    cat_name: "Крепление для камеры"
+    priority: 50
+
+  - pattern: "Прочее"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 50
+
+  - pattern: "Прочее"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 50
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # МОНИТОРЫ / видеосендеры / рекордеры
+  # Ozon:  17028647/971307628 — Видеосендер (для мониторов-видеосендеров)
+  # Ozon:  200001713/91750    — Студийное оборудование (для рекордеров)
+  # WB:    546                — Дисплеи для камер
+  # YM:    70121530           — Аксессуары для фото- и видеокамер
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "(?:Мониторы-видеосендер|Видеосендер)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 971307628
+    cat_name: "Видеосендер"
+    priority: 65
+
+  - pattern: "(?:Мониторы-видеосендер|Видеосендер)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: wb
+    cat_id: 546
+    cat_name: "Дисплеи для камер"
+    priority: 65
+
+  - pattern: "(?:Мониторы-видеосендер|Видеосендер)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 65
+
+  - pattern: "(?:Накамерные мониторы|Прочие мониторы|Мониторы-рекордеры)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 91740
+    cat_name: "Аксессуар для камеры"
+    priority: 60
+
+  - pattern: "(?:Накамерные мониторы|Прочие мониторы|Мониторы-рекордеры)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: wb
+    cat_id: 546
+    cat_name: "Дисплеи для камер"
+    priority: 60
+
+  - pattern: "(?:Накамерные мониторы|Прочие мониторы|Мониторы-рекордеры)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # КОНВЕРТЕРЫ / карты захвата / видеомикшеры / аудиомикшеры
+  # Ozon:  200001713/91750 — Студийное оборудование
+  # WB:    5724 / 4539    — Карты видеозахвата / Конвертеры видеосигнала
+  # YM:    17677719        — Прочее фотооборудование
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "(?:Конвертеры|Карты видеозахвата|Видеомикшеры|Аудиомикшеры)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91750
+    cat_name: "Студийное оборудование"
+    priority: 60
+
+  - pattern: "Карты видеозахвата"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 5724
+    cat_name: "Карты видеозахвата"
+    priority: 60
+
+  - pattern: "Конвертеры"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 4539
+    cat_name: "Конвертеры видеосигнала"
+    priority: 60
+
+  - pattern: "(?:Видеомикшеры|Аудиомикшеры)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: wb
+    cat_id: 5724
+    cat_name: "Карты видеозахвата"
+    priority: 60
+
+  - pattern: "(?:Конвертеры|Карты видеозахвата|Видеомикшеры|Аудиомикшеры)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ym
+    cat_id: 17677719
+    cat_name: "Прочее фотооборудование"
+    priority: 60
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # АККУМУЛЯТОРЫ / ЗАРЯДНЫЕ УСТРОЙСТВА
+  # Ozon (аккумуляторы):  17028910/91883 — Батарейки и аккумуляторы › Батарея-аккумулятор
+  # Ozon (зарядники):     17028627/95778 — Зарядные устройства › Зарядное устройство для акк.батареек
+  # WB:    5742   — Аккумуляторы для фотоаппаратов
+  # YM:    91156  — Аккумуляторы и зарядные устройства
+  # ══════════════════════════════════════════════════════════════════════════
+
+  # Прочие аккумуляторы (верифицировано: товар 18354)
+  - pattern: "Прочие аккумуляторы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028910
+    cat_type_id: 91883
+    cat_name: "Батарея-аккумулятор"
+    priority: 70
+
+  - pattern: "Прочие аккумуляторы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 5742
+    cat_name: "Аккумуляторы для фотоаппаратов"
+    priority: 70
+
+  - pattern: "Прочие аккумуляторы"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 91156
+    cat_name: "Аккумуляторы и зарядные устройства"
+    priority: 70
+
+  - pattern: "Зарядные устройства"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028627
+    cat_type_id: 95778
+    cat_name: "Зарядное устройство для аккумуляторных батареек"
+    priority: 70
+
+  - pattern: "Зарядные устройства"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 5742
+    cat_name: "Аккумуляторы для фотоаппаратов"
+    priority: 70
+
+  - pattern: "Зарядные устройства"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 91156
+    cat_name: "Аккумуляторы и зарядные устройства"
+    priority: 70
+
+  # Общий паттерн: аккумулятор (по folder или названию модели)
+  - pattern: "(?:аккумулятор|NP-F|NP-FZ|LP-E|EN-EL|BP-)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028910
+    cat_type_id: 91883
+    cat_name: "Батарея-аккумулятор"
+    priority: 50
+
+  - pattern: "(?:аккумулятор|NP-F|NP-FZ|LP-E|EN-EL|BP-)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: wb
+    cat_id: 5742
+    cat_name: "Аккумуляторы для фотоаппаратов"
+    priority: 50
+
+  - pattern: "(?:аккумулятор|NP-F|NP-FZ|LP-E|EN-EL|BP-)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ym
+    cat_id: 91156
+    cat_name: "Аккумуляторы и зарядные устройства"
+    priority: 50
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # КАБЕЛИ / ПЕРЕХОДНИКИ
+  # Ozon (кабель питания): 17028634/95674  — Кабели и переходники › Кабель-переходник
+  # Ozon (силовой кабель): 17028634/970825506 — Сетевой кабель питания
+  # WB:    2436  — Переходники
+  # YM:    70121530 — Аксессуары для фото- и видеокамер
+  # ══════════════════════════════════════════════════════════════════════════
+
+  # Кабели питания (верифицировано: товар 17319)
+  - pattern: "Кабели питания"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91750
+    cat_name: "Студийное оборудование"
+    priority: 70
+
+  - pattern: "Кабели питания"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 2436
+    cat_name: "Переходники"
+    priority: 70
+
+  - pattern: "Кабели питания"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 70
+
+  - pattern: "Адаптеры и переходники"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028634
+    cat_type_id: 95674
+    cat_name: "Кабель-переходник"
+    priority: 60
+
+  - pattern: "Адаптеры и переходники"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 2436
+    cat_name: "Переходники"
+    priority: 60
+
+  - pattern: "Адаптеры и переходники"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  # Прочее (в разделе Кабели)
+  - pattern: "Прочее"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028634
+    cat_type_id: 95674
+    cat_name: "Кабель-переходник"
+    priority: 45
+
+  - pattern: "Прочее"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 2436
+    cat_name: "Переходники"
+    priority: 45
+
+  - pattern: "Прочее"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 45
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # МИКРОФОНЫ / АУДИО / ОПЕРСВЯЗЬ
+  # Ozon:  17028925/95141 — Микрофоны и аксессуары › Микрофон
+  # WB:    нет специфичного WB предмета — используем аксессуары для камер (545)
+  # YM:    70121530       — Аксессуары для фото- и видеокамер
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "(?:Петличные системы|Микрофоны)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028925
+    cat_type_id: 95141
+    cat_name: "Микрофон"
+    priority: 60
+
+  - pattern: "(?:Петличные системы|Микрофоны)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "(?:Петличные системы|Микрофоны)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  - pattern: "Оперсвязь"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028925
+    cat_type_id: 95141
+    cat_name: "Микрофон"
+    priority: 60
+
+  - pattern: "Оперсвязь"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 60
+
+  - pattern: "Оперсвязь"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 60
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # СВЕТОФИЛЬТРЫ
+  # Ozon:  17028647/91748 — Аксессуары для фото- и видеотехники › Светофильтр
+  # WB:    1239           — Фильтры для камер
+  # YM:    994004         — Светофильтры
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "Фильтры"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 91748
+    cat_name: "Светофильтр"
+    priority: 60
+
+  - pattern: "Фильтры"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 1239
+    cat_name: "Фильтры для камер"
+    priority: 60
+
+  - pattern: "Фильтры"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 994004
+    cat_name: "Светофильтры"
+    priority: 60
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # НОСИТЕЛИ ИНФОРМАЦИИ / КАРТЫ ПАМЯТИ / КАРТРИДЕРЫ
+  # Ozon:  93726150/10008 → нет в кэше, используем 17028647/91611
+  # WB:    5724 — Карты видеозахвата (ближайшее) → нет карт памяти
+  # YM:    91156 — Аккумуляторы и зарядные устройства (ближайшее)
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "(?:Носители информации|Картридеры)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 91611
+    cat_name: "Картридж для фото"
+    priority: 60
+
+  - pattern: "(?:Носители информации|Картридеры)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: wb
+    cat_id: 5724
+    cat_name: "Карты видеозахвата"
+    priority: 60
+
+  - pattern: "(?:Носители информации|Картридеры)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ym
+    cat_id: 91156
+    cat_name: "Аккумуляторы и зарядные устройства"
+    priority: 60
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # СУМКИ / КЕЙСЫ
+  # Ozon:  200001713/98549 — Фотобокс (ближайшее) → нет сумок в оборудовании студии
+  # WB:    4115            — Сумки для фотоаппаратов
+  # YM:    70145118        — Сумки для фото-видеотехники
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "(?:Сумки и кейсы для хранения|Сумки и кейсы)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 91740
+    cat_name: "Аксессуар для камеры"
+    priority: 60
+
+  - pattern: "(?:Сумки и кейсы для хранения|Сумки и кейсы)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: wb
+    cat_id: 4115
+    cat_name: "Сумки для фотоаппаратов"
+    priority: 60
+
+  - pattern: "(?:Сумки и кейсы для хранения|Сумки и кейсы)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ym
+    cat_id: 70145118
+    cat_name: "Сумки для фото-видеотехники"
+    priority: 60
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # ФОТОАППАРАТЫ / ОБЪЕКТИВЫ
+  # Ozon:  17028647/91740 — Аксессуар для камеры (для аксессуаров)
+  # WB:    790            — Фотоаппараты
+  # YM:    91148          — Фотоаппараты
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "Цифровые камеры"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 91740
+    cat_name: "Аксессуар для камеры"
+    priority: 60
+
+  - pattern: "Цифровые камеры"
+    pattern_type: exact
+    field: internal_category
+    marketplace: wb
+    cat_id: 790
+    cat_name: "Фотоаппараты"
+    priority: 60
+
+  - pattern: "Цифровые камеры"
+    pattern_type: exact
+    field: internal_category
+    marketplace: ym
+    cat_id: 91148
+    cat_name: "Фотоаппараты"
+    priority: 60
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # ПРАВИЛА ПО НАЗВАНИЮ ТОВАРА (field: name)
+  # Приоритет 25 — ниже папочных правил (50-70)
+  # Используются когда internal_category не определена или не сматчена
+  # ══════════════════════════════════════════════════════════════════════════
+
+  - pattern: "(?:Штатив|трипод|монопод|Tripod|Monopod)"
+    pattern_type: regex
+    field: name
+    marketplace: ozon
+    cat_id: 17028651
+    cat_type_id: 91780
+    cat_name: "Штатив"
+    priority: 25
+
+  - pattern: "(?:Штатив|трипод|монопод)"
+    pattern_type: regex
+    field: name
+    marketplace: wb
+    cat_id: 4680
+    cat_name: "Штативы для съемки"
+    priority: 25
+
+  - pattern: "(?:Штатив|трипод|монопод)"
+    pattern_type: regex
+    field: name
+    marketplace: ym
+    cat_id: 17677674
+    cat_name: "Стойки и крепежи"
+    priority: 25
+
+  - pattern: "(?:Осветител|LED|панель света|световой)"
+    pattern_type: regex
+    field: name
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 97420
+    cat_name: "Свет для мобильной съемки"
+    priority: 25
+
+  - pattern: "(?:Осветител|LED|панель света)"
+    pattern_type: regex
+    field: name
+    marketplace: wb
+    cat_id: 5594
+    cat_name: "Осветители для смартфона"
+    priority: 25
+
+  - pattern: "(?:Осветител|LED панель|световой прибор)"
+    pattern_type: regex
+    field: name
+    marketplace: ym
+    cat_id: 17677661
+    cat_name: "Осветительное оборудование"
+    priority: 25
+
+  - pattern: "(?:Клетка|риг|Cage|Rig|обвес)"
+    pattern_type: regex
+    field: name
+    marketplace: ozon
+    cat_id: 200001713
+    cat_type_id: 91741
+    cat_name: "Крепление для камеры"
+    priority: 25
+
+  - pattern: "(?:Клетка|риг|Cage|Rig)"
+    pattern_type: regex
+    field: name
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 25
+
+  - pattern: "(?:Клетка|риг|Cage|Rig)"
+    pattern_type: regex
+    field: name
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 25
+
+  - pattern: "(?:Аккумулятор|Battery|NP-F|NP-FZ|LP-E|EN-EL|BP-)"
+    pattern_type: regex
+    field: name
+    marketplace: ozon
+    cat_id: 17028910
+    cat_type_id: 91883
+    cat_name: "Батарея-аккумулятор"
+    priority: 25
+
+  - pattern: "(?:Аккумулятор|Battery)"
+    pattern_type: regex
+    field: name
+    marketplace: wb
+    cat_id: 5742
+    cat_name: "Аккумуляторы для фотоаппаратов"
+    priority: 25
+
+  - pattern: "(?:Аккумулятор|Battery)"
+    pattern_type: regex
+    field: name
+    marketplace: ym
+    cat_id: 91156
+    cat_name: "Аккумуляторы и зарядные устройства"
+    priority: 25
+
+  - pattern: "(?:Зарядн|Charger)"
+    pattern_type: regex
+    field: name
+    marketplace: ozon
+    cat_id: 17028627
+    cat_type_id: 95778
+    cat_name: "Зарядное устройство для аккумуляторных батареек"
+    priority: 26
+
+  - pattern: "(?:Зарядн|Charger)"
+    pattern_type: regex
+    field: name
+    marketplace: wb
+    cat_id: 5742
+    cat_name: "Аккумуляторы для фотоаппаратов"
+    priority: 26
+
+  - pattern: "(?:Зарядн|Charger)"
+    pattern_type: regex
+    field: name
+    marketplace: ym
+    cat_id: 91156
+    cat_name: "Аккумуляторы и зарядные устройства"
+    priority: 26
+
+  - pattern: "(?:Микрофон|Microphone|петличн)"
+    pattern_type: regex
+    field: name
+    marketplace: ozon
+    cat_id: 17028925
+    cat_type_id: 95141
+    cat_name: "Микрофон"
+    priority: 25
+
+  - pattern: "(?:Микрофон|Microphone|петличн)"
+    pattern_type: regex
+    field: name
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 25
+
+  - pattern: "(?:Микрофон|Microphone|петличн)"
+    pattern_type: regex
+    field: name
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 25
+
+  - pattern: "(?:Фильтр|Filter|ND|поляризацион)"
+    pattern_type: regex
+    field: name
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 91748
+    cat_name: "Светофильтр"
+    priority: 25
+
+  - pattern: "(?:Фильтр|Filter|ND|поляризацион)"
+    pattern_type: regex
+    field: name
+    marketplace: wb
+    cat_id: 1239
+    cat_name: "Фильтры для камер"
+    priority: 25
+
+  - pattern: "(?:Фильтр|Filter|ND|поляризацион)"
+    pattern_type: regex
+    field: name
+    marketplace: ym
+    cat_id: 994004
+    cat_name: "Светофильтры"
+    priority: 25
+
+  - pattern: "(?:Кабель|Cable|провод)"
+    pattern_type: regex
+    field: name
+    marketplace: ozon
+    cat_id: 17028634
+    cat_type_id: 95674
+    cat_name: "Кабель-переходник"
+    priority: 25
+
+  - pattern: "(?:Кабель|Cable|провод)"
+    pattern_type: regex
+    field: name
+    marketplace: wb
+    cat_id: 2436
+    cat_name: "Переходники"
+    priority: 25
+
+  - pattern: "(?:Кабель|Cable|провод)"
+    pattern_type: regex
+    field: name
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 25
+
+  - pattern: "(?:Монитор|Monitor|видеомонитор)"
+    pattern_type: regex
+    field: name
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 91740
+    cat_name: "Аксессуар для камеры"
+    priority: 25
+
+  - pattern: "(?:Монитор|Monitor|видеомонитор)"
+    pattern_type: regex
+    field: name
+    marketplace: wb
+    cat_id: 546
+    cat_name: "Дисплеи для камер"
+    priority: 25
+
+  - pattern: "(?:Монитор|Monitor|видеомонитор)"
+    pattern_type: regex
+    field: name
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 25
+
+  - pattern: "(?:Стабилизатор|Gimbal|Стедикам)"
+    pattern_type: regex
+    field: name
+    marketplace: ozon
+    cat_id: 17028651
+    cat_type_id: 97357
+    cat_name: "Стабилизатор для камеры"
+    priority: 25
+
+  - pattern: "(?:Стабилизатор|Gimbal|Стедикам)"
+    pattern_type: regex
+    field: name
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 25
+
+  - pattern: "(?:Стабилизатор|Gimbal|Стедикам)"
+    pattern_type: regex
+    field: name
+    marketplace: ym
+    cat_id: 17677674
+    cat_name: "Стойки и крепежи"
+    priority: 25
+
+  - pattern: "(?:Сумка|Рюкзак|Кейс|Чехол|Bag|Case|Backpack)"
+    pattern_type: regex
+    field: name
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 91740
+    cat_name: "Аксессуар для камеры"
+    priority: 25
+
+  - pattern: "(?:Сумка|Рюкзак|Кейс для камер)"
+    pattern_type: regex
+    field: name
+    marketplace: wb
+    cat_id: 4115
+    cat_name: "Сумки для фотоаппаратов"
+    priority: 25
+
+  - pattern: "(?:Сумка|Рюкзак|Кейс)"
+    pattern_type: regex
+    field: name
+    marketplace: ym
+    cat_id: 70145118
+    cat_name: "Сумки для фото-видеотехники"
+    priority: 25
+
+  # ══════════════════════════════════════════════════════════════════════════
+  # FALLBACK — прочие аксессуары
+  # Применяется только если ни одно другое правило не сработало
+  # ══════════════════════════════════════════════════════════════════════════
+  - pattern: "(?:Прочее|Прочие аксессуары|Аксессуары)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ozon
+    cat_id: 17028647
+    cat_type_id: 91740
+    cat_name: "Аксессуар для камеры"
+    priority: 20
+
+  - pattern: "(?:Прочее|Прочие аксессуары|Аксессуары)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: wb
+    cat_id: 545
+    cat_name: "Крепления для камер"
+    priority: 20
+
+  - pattern: "(?:Прочее|Прочие аксессуары|Аксессуары)"
+    pattern_type: regex
+    field: internal_category
+    marketplace: ym
+    cat_id: 70121530
+    cat_name: "Аксессуары для фото- и видеокамер"
+    priority: 20
