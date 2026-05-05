@@ -241,8 +241,8 @@ class MoySkladClient:
             # miniature — уменьшенная версия с авторизацией
             # Для ЯМ нам нужен публичный URL — берём downloadHref если есть
             url = (
-                img.get("miniature", {}).get("href", "") or
-                img.get("meta", {}).get("href", "")
+                img.get("meta", {}).get("downloadHref", "") or
+                img.get("miniature", {}).get("href", "")
             )
             if url:
                 result.append(url)
