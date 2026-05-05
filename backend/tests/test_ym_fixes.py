@@ -1,3 +1,4 @@
+import asyncio
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -27,8 +28,6 @@ def test_get_images_prefers_meta_download_href():
             }
         ]
     }
-    import asyncio
-
     async def _mock_get(path, params=None):
         return fake_rows
 
@@ -53,8 +52,6 @@ def test_get_images_falls_back_to_miniature_when_no_download_href():
             }
         ]
     }
-    import asyncio
-
     async def _mock_get(path, params=None):
         return fake_rows
 
