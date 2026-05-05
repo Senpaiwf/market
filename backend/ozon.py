@@ -40,9 +40,11 @@ def _to_ozon_values(val) -> list:
         return result
     if isinstance(val, dict):
         return [{"dictionary_value_id": int(val.get("dict_id") or 0), "value": str(val.get("value", ""))}]
-    # Plain string — may be comma-separated for legacy is_collection entries
-    parts = [v.strip() for v in str(val).split(",") if v.strip()]
-    return [{"dictionary_value_id": 0, "value": v} for v in parts]
+    # Plain string — single value (is_collection entries are stored as lists)
+    s = str(val).strip()
+    if not s:
+        return []
+    return [{"dictionary_value_id": 0, "value": s}]
 
 
 class OzonClient:
