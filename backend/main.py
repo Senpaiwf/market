@@ -2276,6 +2276,7 @@ async def _prepare_images(
     result: list = []
     master_paths: list[str] = []
     warnings: list = []
+    import shutil
 
     for i, url in enumerate(all_raw):
         try:
@@ -2288,7 +2289,8 @@ async def _prepare_images(
                     rel = url.split("media/uploads/")[-1]
                     disk_path = os.path.join(UPLOADS_DIR, rel)
                     try:
-                        raw = open(disk_path, "rb").read()
+                        with open(disk_path, "rb") as f:
+                            raw = f.read()
                     except Exception:
                         raw = b""
                 else:
@@ -2311,6 +2313,8 @@ async def _prepare_images(
                         f.write(raw)
 
             # ── Step B: generate subfolder JPEG from master ───────────
+            master_paths.append(master_path)
+
             if not os.path.exists(sub_path):
                 if _HAS_PILLOW:
                     try:
@@ -2320,10 +2324,8 @@ async def _prepare_images(
                         warnings.append(f"Ошибка конвертации фото {i+1}: {e}")
                         continue
                 else:
-                    import shutil
                     shutil.copy2(master_path, sub_path)
-
-            master_paths.append(master_path)
+                    warnings.append(f"Pillow недоступен — фото {i+1} скопировано как PNG в .jpg (возможен отказ маркетплейса)")
             pub = _upload_url(folder_key, f"{subfolder}/img_{i}.jpg", base_url=base_url)
             if pub:
                 result.append(pub)
