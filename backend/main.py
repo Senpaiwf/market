@@ -96,6 +96,7 @@ class YMPreviewRequest(YMKeys):
 class YMUploadRequest(YMKeys):
     codes: List[str]
     dry_run: bool = True
+    force_update: bool = False
     resolved: Optional[Dict[str, Dict[str, Any]]] = {}
 
 class OzonUploadRequest(OzonKeys):
@@ -534,10 +535,20 @@ async def ym_upload_stream(req: YMUploadRequest, request: Request):
 
                 yield evt("progress", current=i+1, total=total, code=code,
                           percent=int((i+0.5)/total*100), status="uploading")
-                yield evt("log", level="info", msg="  → Отправляем на Яндекс.Маркет...")
-                result = await ym.upload(product, cat, saved)
+                action_word = "Обновляем" if req.force_update else "Отправляем"
+                yield evt("log", level="info", msg=f"  → {action_word} на Яндекс.Маркет...")
+                result = await ym.upload(product, cat, saved, force_recategory=req.force_update)
                 if result["ok"]:
                     offer_id_val = result.get("offer_id")
+                    dbg = result.get("debug") or {}
+                    if dbg and req.force_update:
+                        yield evt("log", level="info",
+                                  msg=f"  ℹ [debug] существует={dbg.get('offer_exists')} "
+                                      f"кат_ЯМ={dbg.get('existing_category_id')} "
+                                      f"кат_наша={dbg.get('desired_category_id')} "
+                                      f"причина_пропуска={dbg.get('skipped_reason','—')}")
+                    if result.get("archived_and_recreated"):
+                        yield evt("log", level="hi", msg=f"  ↻ Оффер архивирован и создан заново с новой категорией!")
                     yield evt("log", level="success", msg=f"  ✓ Загружен! offer_id: {offer_id_val}")
                     candidates = [offer_id_val, code, product.get("article",""), product.get("product_id","")]
                     state   = await ym.validate_offer_state(candidates)
@@ -550,6 +561,17 @@ async def ym_upload_stream(req: YMUploadRequest, request: Request):
                         yield evt("log", level=level, msg=f"    {color} Рейтинг: {rating}/100 (status: {status})")
                     else:
                         yield evt("log", level="info", msg=f"    {color} Status: {status}")
+                    # Check if ЯМ category matches what we sent
+                    ym_cat_id = state.get("ym_category_id")
+                    desired_cat_id = int(cat) if str(cat).isdigit() else None
+                    if ym_cat_id and desired_cat_id and ym_cat_id != desired_cat_id:
+                        if result.get("archived_and_recreated"):
+                            yield evt("log", level="info",
+                                      msg=f"    ℹ Категория обновляется (ЯМ обрабатывает асинхронно, проверьте кабинет через ~1 час)")
+                        else:
+                            yield evt("log", level="warn",
+                                      msg=f"    ⚠ Категория в ЯМ ({ym_cat_id}) ≠ запрошенной ({desired_cat_id}). "
+                                          f"Для смены категории используйте кнопку «Обновить на ЯМ».")
                     critical = _filter_critical(missing)
                     if critical:
                         yield evt("log", level="warn",
@@ -1978,8 +2000,9 @@ async def api_upload_video(code: str, file: UploadFile = File(...)):
 # ─── Internal helpers ─────────────────────────────────────────
 
 async def _ai_enrich(code, product, category_id, ym, bh_specs):
-    if code in _AI_ENRICH_CACHE:
-        return _AI_ENRICH_CACHE[code]
+    cache_key = (code, str(category_id or ""))
+    if cache_key in _AI_ENRICH_CACHE:
+        return _AI_ENRICH_CACHE[cache_key]
     if not category_id:
         return None
     try:
@@ -1990,7 +2013,7 @@ async def _ai_enrich(code, product, category_id, ym, bh_specs):
         result = await ai_enrich_product(product, ym_params, bh_specs)
     except Exception as e:
         return {"error": f"ai_enrich: {str(e)[:200]}", "brand":"", "description":"", "parameter_values":[]}
-    _AI_ENRICH_CACHE[code] = result
+    _AI_ENRICH_CACHE[cache_key] = result
     return result
 
 async def _enrich_from_bh(code, product, category_id, ym):
@@ -2226,39 +2249,41 @@ def _add_wb_border(img_bytes: bytes, border_pct: float = 0.08) -> bytes:
 
 async def _prepare_images(
     ms_token: str, product: dict, saved: dict, code: str,
-    subfolder: str = "proc", border_pct: float = 0.0,
+    subfolder: str = "proc",
     base_url: str = "",
-) -> tuple[list, list]:
-    """Download product images from MoySklad to local disk, return public URLs.
+) -> tuple[list, list[str], list]:
+    """Download product images, save PNG masters, return (public_urls, master_disk_paths, warnings).
 
-    Photos are saved to media/uploads/{article}/{subfolder}/img_{i}.jpg
-    (falls back to code if article unavailable).
-    base_url is used when PUBLIC_BASE_URL env var is not set — pass request.base_url.
+    Master PNGs: media/uploads/{article}/master/img_{i}.png  (reused across marketplaces)
+    Subfolder JPEGs: media/uploads/{article}/{subfolder}/img_{i}.jpg  (per-marketplace)
     """
     user_images = saved.get("user_images") or []
     ms_images   = product.get("images") or []
     all_raw = (user_images + ms_images) if user_images else ms_images
-    all_raw = all_raw[:10]
+    all_raw = all_raw[:15]  # Ozon allows up to 15; ЯМ/WB callers slice to 10
 
-    # Organise folder by article (human-readable) with code as fallback
     article = product.get("article") or ""
     folder_key = "".join(c for c in article if c.isalnum() or c in "-_") if article else ""
     if not folder_key:
         folder_key = "".join(c for c in code if c.isalnum() or c in "-_")
-    dst = os.path.join(UPLOADS_DIR, folder_key, subfolder)
-    os.makedirs(dst, exist_ok=True)
+
+    master_dir = os.path.join(UPLOADS_DIR, folder_key, "master")
+    sub_dir    = os.path.join(UPLOADS_DIR, folder_key, subfolder)
+    os.makedirs(master_dir, exist_ok=True)
+    os.makedirs(sub_dir, exist_ok=True)
 
     ms_auth = f"Bearer {ms_token}" if ms_token else None
     result: list = []
+    master_paths: list[str] = []
     warnings: list = []
-    downloaded = 0
 
     for i, url in enumerate(all_raw):
         try:
-            filename  = f"img_{i}.jpg"
-            filepath  = os.path.join(dst, filename)
+            master_path = os.path.join(master_dir, f"img_{i}.png")
+            sub_path    = os.path.join(sub_dir,    f"img_{i}.jpg")
 
-            if not os.path.exists(filepath):
+            # ── Step A: ensure PNG master exists ──────────────────────
+            if not os.path.exists(master_path):
                 if "media/uploads" in url:
                     rel = url.split("media/uploads/")[-1]
                     disk_path = os.path.join(UPLOADS_DIR, rel)
@@ -2273,16 +2298,36 @@ async def _prepare_images(
                 if not raw:
                     warnings.append(f"Не удалось скачать фото {i+1}: {url[:80]}")
                     continue
-                downloaded += 1
-                processed = _add_wb_border(raw, border_pct) if border_pct > 0 else raw
-                with open(filepath, "wb") as f:
-                    f.write(processed)
-            else:
-                downloaded += 1
 
-            pub = _upload_url(folder_key, f"{subfolder}/{filename}", base_url=base_url)
+                if _HAS_PILLOW:
+                    try:
+                        img = _PILImage.open(io.BytesIO(raw)).convert("RGB")
+                        img.save(master_path, "PNG")
+                    except Exception:
+                        with open(master_path, "wb") as f:
+                            f.write(raw)
+                else:
+                    with open(master_path, "wb") as f:
+                        f.write(raw)
+
+            # ── Step B: generate subfolder JPEG from master ───────────
+            if not os.path.exists(sub_path):
+                if _HAS_PILLOW:
+                    try:
+                        img = _PILImage.open(master_path).convert("RGB")
+                        img.save(sub_path, "JPEG", quality=95)
+                    except Exception as e:
+                        warnings.append(f"Ошибка конвертации фото {i+1}: {e}")
+                        continue
+                else:
+                    import shutil
+                    shutil.copy2(master_path, sub_path)
+
+            master_paths.append(master_path)
+            pub = _upload_url(folder_key, f"{subfolder}/img_{i}.jpg", base_url=base_url)
             if pub:
                 result.append(pub)
+
         except Exception as e:
             warnings.append(f"Ошибка обработки фото {i+1}: {e}")
             continue
@@ -2293,9 +2338,9 @@ async def _prepare_images(
             "PUBLIC_BASE_URL не задан в .env — маркетплейс не сможет скачать фотографии. "
             "Укажите публичный URL сервера в .env: PUBLIC_BASE_URL=http://your-server.com"
         )
-        return [], warnings
+        return [], master_paths, warnings
 
-    return result, warnings
+    return result, master_paths, warnings
 
 @app.post("/api/wb/test")
 async def wb_test(k: WBKeys):
