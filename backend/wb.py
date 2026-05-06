@@ -77,6 +77,37 @@ class WildberriesClient:
         except Exception as e:
             return {"ok": False, "error": f"Ошибка подключения: {e}"}
 
+    async def upload_photo(self, img_bytes: bytes) -> str:
+        """Upload photo binary to WB CDN. Returns the WB CDN URL.
+
+        Raises RuntimeError on failure so the caller can catch per-photo.
+        """
+        url = f"{BASE}/content/v2/media/file"
+        auth_header = self.h["Authorization"]
+        try:
+            async with httpx.AsyncClient(timeout=60) as c:
+                r = await c.post(
+                    url,
+                    headers={"Authorization": auth_header},
+                    files={"file": ("photo.png", img_bytes, "image/png")},
+                )
+                if r.status_code == 200:
+                    data = r.json().get("data") or {}
+                    cdn_url = data.get("url", "")
+                    if cdn_url:
+                        return cdn_url
+                    raise RuntimeError(f"WB фото upload: нет URL в ответе: {r.text[:200]}")
+                try:
+                    err = r.json()
+                except Exception:
+                    err = {"errorText": r.text[:200]}
+                msg = err.get("errorText") or err.get("message") or str(err)[:200]
+                raise RuntimeError(f"WB фото upload HTTP {r.status_code}: {msg}")
+        except RuntimeError:
+            raise
+        except Exception as e:
+            raise RuntimeError(f"WB фото upload: ошибка подключения: {e}") from e
+
     async def test(self) -> dict:
         """Проверка подключения — читаем список родительских категорий."""
         r = await self._get("/content/v2/object/parent/all", {"locale": "ru"})
