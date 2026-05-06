@@ -520,8 +520,8 @@ async def ym_upload_stream(req: YMUploadRequest, request: Request):
                 yield evt("progress", current=i+1, total=total, code=code,
                           percent=int((i+0.4)/total*100), status="processing")
                 yield evt("log", level="info", msg="  → Подготавливаем фотографии...")
-                ym_photos, img_warns = await _prepare_images(
-                    req.ms_token, product, saved, code, subfolder="ym_proc", border_pct=0,
+                ym_photos, _ym_masters, img_warns = await _prepare_images(
+                    req.ms_token, product, saved, code, subfolder="ym_proc",
                     base_url=_req_base,
                 )
                 for w in img_warns:
@@ -851,8 +851,8 @@ async def ozon_upload_stream(req: OzonUploadRequest, request: Request):
                 yield evt("progress", current=i+1, total=total, code=code,
                           percent=int((i+0.4)/total*100), status="processing")
                 yield evt("log", level="info", msg="  → Подготавливаем фотографии...")
-                oz_photos, img_warns = await _prepare_images(
-                    req.ms_token, product, saved, code, subfolder="oz_proc", border_pct=0,
+                oz_photos, _oz_masters, img_warns = await _prepare_images(
+                    req.ms_token, product, saved, code, subfolder="oz_proc",
                     base_url=_req_base,
                 )
                 for w in img_warns:
@@ -1933,7 +1933,7 @@ async def api_photos_download(req: PhotosDownloadRequest, request: Request):
     if not product.get("ok"):
         return {"ok": False, "error": product.get("error", "МС: не найден")}
     _req_base = _req_base_url(request)
-    urls, warns = await _prepare_images(ms_token, product, {}, code, subfolder="orig", base_url=_req_base)
+    urls, _orig_masters, warns = await _prepare_images(ms_token, product, {}, code, subfolder="orig", base_url=_req_base)
     article = product.get("article") or code
     folder_key = "".join(c for c in article if c.isalnum() or c in "-_") or code
     disk_path = os.path.join(UPLOADS_DIR, folder_key, "orig")
