@@ -2241,7 +2241,7 @@ def _add_wb_border(img_bytes: bytes, border_pct: float = 0.08) -> bytes:
         canvas = _PILImage.new("RGB", (canvas_size, canvas_size), (255, 255, 255))
         canvas.paste(resized, ((canvas_size - nw) // 2, (canvas_size - nh) // 2))
         buf = io.BytesIO()
-        canvas.save(buf, "JPEG", quality=95)
+        canvas.save(buf, "PNG")
         return buf.getvalue()
     except Exception:
         return img_bytes
@@ -2585,10 +2585,12 @@ async def wb_upload_stream(req: WBUploadRequest, request: Request):
                 action_word = "Обновляем" if req.force_update else "Загружаем на"
                 yield evt("log", level="info", msg=f"  → {action_word} WB...")
 
+                # user_images already processed into wb_photos via CDN upload — exclude from build_card
+                saved_wb = {**saved, "user_images": []}
                 if req.force_update:
-                    result = await wb.force_update(product, saved)
+                    result = await wb.force_update(product, saved_wb)
                 else:
-                    result = await wb.upload(product, saved)
+                    result = await wb.upload(product, saved_wb)
 
                 if result["ok"]:
                     action = "Обновлено" if (result.get("updated") or req.force_update) else "Создано"
