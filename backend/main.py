@@ -2241,7 +2241,7 @@ def _add_wb_border(img_bytes: bytes, border_pct: float = 0.08) -> bytes:
         canvas = _PILImage.new("RGB", (canvas_size, canvas_size), (255, 255, 255))
         canvas.paste(resized, ((canvas_size - nw) // 2, (canvas_size - nh) // 2))
         buf = io.BytesIO()
-        canvas.save(buf, "PNG")
+        canvas.save(buf, "JPEG", quality=95)
         return buf.getvalue()
     except Exception:
         return img_bytes
@@ -2550,35 +2550,47 @@ async def wb_upload_stream(req: WBUploadRequest, request: Request):
             else:
                 yield evt("progress", current=i+1, total=total, code=code,
                           percent=int((i+0.5)/total*100), status="processing")
-                yield evt("log", level="info", msg="  → Скачиваем фотографии для WB...")
-                _wb_urls, wb_master_paths, img_warns = await _prepare_images(
+                yield evt("log", level="info", msg="  → Подготавливаем фотографии для WB...")
+                _dummy_urls, wb_master_paths, img_warns = await _prepare_images(
                     req.ms_token, product, saved, code, subfolder="wb_proc",
                     base_url=_req_base,
                 )
                 for w in img_warns:
                     yield evt("log", level="warn", msg=f"  ⚠ {w}")
 
+                # Apply WB white border to each master, save bordered JPEG to wb_proc/
+                article_key = product.get("article") or ""
+                folder_key = "".join(c for c in article_key if c.isalnum() or c in "-_") if article_key else ""
+                if not folder_key:
+                    folder_key = "".join(c for c in code if c.isalnum() or c in "-_")
+                wb_dir = os.path.join(UPLOADS_DIR, folder_key, "wb_proc")
+                os.makedirs(wb_dir, exist_ok=True)
+
                 wb_photos: list = []
-                for mp in wb_master_paths[:10]:
+                for i, mp in enumerate(wb_master_paths[:10]):
                     try:
-                        def _read(path=mp):
+                        def _process(path=mp, idx=i):
                             with open(path, "rb") as f:
-                                return f.read()
-                        raw = await asyncio.to_thread(_read)
-                        bordered = _add_wb_border(raw, border_pct=0.08)
-                        cdn_url = await wb.upload_photo(bordered)
-                        wb_photos.append(cdn_url)
+                                raw = f.read()
+                            bordered = _add_wb_border(raw, border_pct=0.08)
+                            out = os.path.join(wb_dir, f"img_{idx}.jpg")
+                            with open(out, "wb") as f:
+                                f.write(bordered)
+                        await asyncio.to_thread(_process)
+                        pub = _upload_url(folder_key, f"wb_proc/img_{i}.jpg", base_url=_req_base)
+                        if pub:
+                            wb_photos.append(pub)
                     except Exception as e:
-                        yield evt("log", level="warn", msg=f"  ⚠ Ошибка загрузки фото на WB CDN: {e}")
+                        yield evt("log", level="warn", msg=f"  ⚠ Ошибка обработки фото {i+1}: {e}")
 
                 product = dict(product)
                 product["images"] = wb_photos
                 if wb_photos:
                     yield evt("log", level="info",
-                              msg=f"  ✓ Фото загружено на WB CDN: {len(wb_photos)} шт.")
+                              msg=f"  ✓ Фото подготовлено: {len(wb_photos)} шт.")
                 else:
                     yield evt("log", level="warn",
-                              msg="  ⚠ Фото не загружены на WB CDN — карточка будет без фотографий")
+                              msg="  ⚠ Фото не готовы — проверьте PUBLIC_BASE_URL в .env")
 
                 yield evt("progress", current=i+1, total=total, code=code,
                           percent=int((i+0.7)/total*100), status="uploading")
