@@ -2561,8 +2561,10 @@ async def wb_upload_stream(req: WBUploadRequest, request: Request):
                 wb_photos: list = []
                 for mp in wb_master_paths[:10]:
                     try:
-                        with open(mp, "rb") as f:
-                            raw = f.read()
+                        def _read(path=mp):
+                            with open(path, "rb") as f:
+                                return f.read()
+                        raw = await asyncio.to_thread(_read)
                         bordered = _add_wb_border(raw, border_pct=0.08)
                         cdn_url = await wb.upload_photo(bordered)
                         wb_photos.append(cdn_url)
