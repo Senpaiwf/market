@@ -238,12 +238,8 @@ class MoySkladClient:
             return []
         result = []
         for img in d.get("rows", []):
-            # miniature — уменьшенная версия с авторизацией
-            # Для ЯМ нам нужен публичный URL — берём downloadHref если есть
-            url = (
-                img.get("meta", {}).get("downloadHref", "") or
-                img.get("miniature", {}).get("href", "")
-            )
+            # Для ЯМ нам нужен публичный URL — берём только downloadHref
+            url = img.get("meta", {}).get("downloadHref", "")
             if url:
                 result.append(url)
         return result

@@ -36,15 +36,15 @@ def test_get_images_prefers_meta_download_href():
     assert urls == ["https://api.moysklad.ru/download/full-size-id"]
 
 
-def test_get_images_falls_back_to_miniature_when_no_download_href():
-    """Falls back to miniature.href when meta.downloadHref is absent."""
+def test_get_images_skips_image_without_download_href():
+    """Images that have no downloadHref must be excluded from the result."""
     client = _make_client()
     fake_rows = {
         "rows": [
             {
                 "meta": {
                     "href": "https://api.moysklad.ru/entity/product/123/images/img1",
-                    # no downloadHref here
+                    # no downloadHref
                 },
                 "miniature": {
                     "href": "https://api.moysklad.ru/download/miniature-id",
@@ -57,7 +57,7 @@ def test_get_images_falls_back_to_miniature_when_no_download_href():
 
     client._get = _mock_get
     urls = asyncio.run(client._get_images("fake-product-id"))
-    assert urls == ["https://api.moysklad.ru/download/miniature-id"]
+    assert urls == []
 
 
 # ── Task 2: _build_params dispatch ────────────────────────────
