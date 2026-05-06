@@ -2241,7 +2241,7 @@ def _add_wb_border(img_bytes: bytes, border_pct: float = 0.08) -> bytes:
         canvas = _PILImage.new("RGB", (canvas_size, canvas_size), (255, 255, 255))
         canvas.paste(resized, ((canvas_size - nw) // 2, (canvas_size - nh) // 2))
         buf = io.BytesIO()
-        canvas.save(buf, "JPEG", quality=92)
+        canvas.save(buf, "JPEG", quality=95)
         return buf.getvalue()
     except Exception:
         return img_bytes
@@ -2550,22 +2550,33 @@ async def wb_upload_stream(req: WBUploadRequest, request: Request):
             else:
                 yield evt("progress", current=i+1, total=total, code=code,
                           percent=int((i+0.5)/total*100), status="processing")
-                yield evt("log", level="info", msg="  → Обрабатываем фотографии для WB...")
-                wb_photos, img_warns = await _prepare_images(
-                    req.ms_token, product, saved, code, subfolder="wb_proc", border_pct=0.08,
+                yield evt("log", level="info", msg="  → Скачиваем фотографии для WB...")
+                _wb_urls, wb_master_paths, img_warns = await _prepare_images(
+                    req.ms_token, product, saved, code, subfolder="wb_proc",
                     base_url=_req_base,
                 )
                 for w in img_warns:
                     yield evt("log", level="warn", msg=f"  ⚠ {w}")
+
+                wb_photos: list = []
+                for mp in wb_master_paths[:10]:
+                    try:
+                        with open(mp, "rb") as f:
+                            raw = f.read()
+                        bordered = _add_wb_border(raw, border_pct=0.08)
+                        cdn_url = await wb.upload_photo(bordered)
+                        wb_photos.append(cdn_url)
+                    except Exception as e:
+                        yield evt("log", level="warn", msg=f"  ⚠ Ошибка загрузки фото на WB CDN: {e}")
+
                 product = dict(product)
                 product["images"] = wb_photos
                 if wb_photos:
                     yield evt("log", level="info",
-                              msg=f"  ✓ Фото обработано: {len(wb_photos)} шт. | URL: {wb_photos[0][:60]}…")
+                              msg=f"  ✓ Фото загружено на WB CDN: {len(wb_photos)} шт.")
                 else:
                     yield evt("log", level="warn",
-                              msg="  ⚠ Фото недоступны — карточка будет без фотографий. "
-                                  "Проверьте PUBLIC_BASE_URL в .env")
+                              msg="  ⚠ Фото не загружены на WB CDN — карточка будет без фотографий")
 
                 yield evt("progress", current=i+1, total=total, code=code,
                           percent=int((i+0.7)/total*100), status="uploading")
